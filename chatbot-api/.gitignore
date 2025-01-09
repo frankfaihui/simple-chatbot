@@ -1,0 +1,84 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+venv.bak/
+*.env
+*.env.*
+
+# Byte-compiled files
+*.pyc
+*.pyo
+
+# Editor-specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Operating system files
+.DS_Store
+Thumbs.db
+*.log
+*.bak
+
+# Testing and Coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+pytestdebug.log
+
+# Mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# FastAPI auto-generated files
+instance/
+
+# Static files
+staticfiles/
+media/
+
+# Dependency management
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Build files
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# PyInstaller
+*.spec
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# SQLite database
+*.sqlite3
+*.db
+
+# Virtual environment
+bin/
+lib/
+lib64/
+include/
+
+# Documentation build artifacts
+docs/_build/
+site/
+
+# Sphinx auto-generated files
+*.doctree
