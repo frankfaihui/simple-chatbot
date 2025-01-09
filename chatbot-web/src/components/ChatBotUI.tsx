@@ -50,6 +50,11 @@ const ChatBotUI = () => {
     }
   };
 
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    sendMessage();
+  };
+
   return (
     <Container size="sm" mt="xl">
       <Paper shadow="sm" p="md" radius="md" withBorder>
@@ -76,17 +81,19 @@ const ChatBotUI = () => {
           </Flex>
         )}
 
-        <Flex mt="sm" gap="sm">
-          <TextInput
-            value={input}
-            onChange={(e) => setInput(e.currentTarget.value)}
-            placeholder="Type your message..."
-            style={{ flex: 1 }}
-          />
-          <Button onClick={sendMessage} disabled={!input.trim()}>
-            Send
-          </Button>
-        </Flex>
+        <form onSubmit={handleSubmit}>
+          <Flex mt="sm" gap="sm">
+            <TextInput
+              value={input}
+              onChange={(e) => setInput(e.currentTarget.value)}
+              placeholder="Type your message..."
+              style={{ flex: 1 }}
+            />
+            <Button type="submit" disabled={!input.trim()}>
+              Send
+            </Button>
+          </Flex>
+        </form>
       </Paper>
     </Container>
   );
