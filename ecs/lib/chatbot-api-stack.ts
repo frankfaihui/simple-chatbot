@@ -48,6 +48,13 @@ export class ChatbotApiStack extends cdk.Stack {
       taskDefinition,
       desiredCount: 1, // Number of instances
       healthCheckGracePeriod: cdk.Duration.seconds(60),
+      platformVersion: ecs.FargatePlatformVersion.LATEST,
+      capacityProviderStrategies: [
+        {
+          capacityProvider: 'FARGATE_SPOT',
+          weight: 1,
+        },
+      ],
     });
 
     // Step 6: Add an Application Load Balancer (ALB)
@@ -75,7 +82,7 @@ export class ChatbotApiStack extends cdk.Stack {
       ],
       healthCheck: {
         path: '/health',
-        interval: cdk.Duration.seconds(30),
+        interval: cdk.Duration.seconds(60),
       },
     });
 
