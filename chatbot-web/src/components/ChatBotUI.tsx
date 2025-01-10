@@ -20,7 +20,7 @@ const ChatBotUI = () => {
 
   useEffect(() => {
     // Connect to WebSocket
-    const ws = new WebSocket("ws://localhost:8000/ws/chat");
+    const ws = new WebSocket(import.meta.env.VITE_WEBSOCKET_URL);
 
     ws.onopen = () => {
       console.log("Connected to WebSocket");
