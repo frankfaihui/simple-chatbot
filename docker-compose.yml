@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: ./chatbot-api
+      dockerfile: Dockerfile
+    container_name: fastapi-backend
+    ports:
+      - "8000:8000"  # Expose FastAPI on localhost:8000
+    environment:
+      - ENV=development  # Example environment variable
+
+  web:
+    build:
+      context: ./chatbot-web
+      dockerfile: Dockerfile
+    container_name: vite-frontend
+    ports:
+      - "3000:80"  # Expose Vite frontend on localhost:3000
+    depends_on:
+      - api
