@@ -4,6 +4,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecrAssets from 'aws-cdk-lib/aws-ecr-assets';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 
 export class ChatbotApiStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -55,12 +56,16 @@ export class ChatbotApiStack extends cdk.Stack {
       internetFacing: true,
     });
 
-    const listener = alb.addListener('HttpListener', {
-      port: 80,
+    // Step 7: Obtain an SSL/TLS Certificate
+    const certificate = acm.Certificate.fromCertificateArn(this, 'Certificate', 'arn:aws:acm:us-west-2:874128104192:certificate/956ff71b-76b8-470d-90a0-9db981e083b5'); // Replace with your ACM certificate ARN
+
+    // Add an HTTPS Listener
+    const httpsListener = alb.addListener('HttpsListener', {
+      port: 443,
+      certificates: [certificate],
     });
 
-    // Register ECS Service as a Target for the ALB
-    listener.addTargets('EcsTarget', {
+    httpsListener.addTargets('HttpsEcsTarget', {
       port: 8000,
       targets: [
         service.loadBalancerTarget({
@@ -69,9 +74,18 @@ export class ChatbotApiStack extends cdk.Stack {
         }),
       ],
       healthCheck: {
-        path: '/health', // Ensure this endpoint exists in your FastAPI app
+        path: '/health',
         interval: cdk.Duration.seconds(30),
       },
+    });
+
+    // Add an HTTP Listener that Redirects to HTTPS
+    alb.addListener('HttpListener', {
+      port: 80,
+      defaultAction: elbv2.ListenerAction.redirect({
+        protocol: 'HTTPS',
+        port: '443',
+      }),
     });
 
     // Output the Load Balancer DNS
