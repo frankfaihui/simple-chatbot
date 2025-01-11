@@ -1,4 +1,5 @@
 import ChatBotUI from '@/components/ChatBotUI';
+import { API_URL } from '@/config';
 import { useEffect } from 'react';
 
 export function HomePage() {
@@ -6,7 +7,7 @@ export function HomePage() {
     const checkHealth = async () => {
 
       try {
-        const response = await fetch("http://localhost:8000", {
+        const response = await fetch(API_URL, {
           method: "GET",
         });
 

@@ -11,8 +11,9 @@ import {
 } from "@mantine/core";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { WEBSOCKET_URL } from "@/config";
 
-const ChatBotUI = () => {
+export default function ChatBotUI() {
   const [messages, setMessages] = useState<{ user: boolean; text: string }[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ const ChatBotUI = () => {
 
   useEffect(() => {
     // Connect to WebSocket
-    const ws = new WebSocket(import.meta.env.VITE_WEBSOCKET_URL);
+    const ws = new WebSocket(WEBSOCKET_URL);
 
     ws.onopen = () => {
       console.log("Connected to WebSocket");
@@ -117,5 +118,3 @@ const ChatBotUI = () => {
     </Container>
   );
 };
-
-export default ChatBotUI;
