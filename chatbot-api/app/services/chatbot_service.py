@@ -1,59 +1,59 @@
-# Import from langchain
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
-
-# Import from langgraph
 from langgraph.graph import START, MessagesState, StateGraph
 from langgraph.checkpoint.memory import MemorySaver
-
 from app.config import OPENAI_API_KEY
 
 class ChatbotService:
     def __init__(self):
-        # 1) Create your chat model
-        # Make sure OPENAI_API_KEY is in your environment, or set it here for demo:
-        # os.environ["OPENAI_API_KEY"] = "sk-..."
+        # Create chat model
         self.model = ChatOpenAI(
             model="gpt-4o-mini",
             openai_api_key=OPENAI_API_KEY,
         )
 
+        # System message to guide the assistant's behavior
         system_msg = SystemMessage(content="You are a helpful assistant. Under all circumstances, keep your response under 100 words.")
 
+        # Function to handle invoking the chat model
         def call_model(state: MessagesState):
-            # Prepend the system message to the conversation
+            # Combine the system message with the user's conversation
             all_messages = [system_msg] + state["messages"]
             response = self.model.invoke(all_messages)
             return {"messages": response}
 
-        # 3) Build a simple graph with one node
+        # Build a simple graph with a single node to handle model calls
         self.workflow = StateGraph(state_schema=MessagesState)
         self.workflow.add_edge(START, "model")
         self.workflow.add_node("model", call_model)
 
-        # 4) Memory store to persist conversation across calls
+        # Memory store to persist conversation context
         self.memory = MemorySaver()
 
-        # 5) Compile the graph with a memory checkpointer
+        # Compile the graph with a memory checkpointer to maintain conversation state
         self.app = self.workflow.compile(checkpointer=self.memory)
 
     async def generate_response(self, user_id: str, user_message: str) -> str:
         """
-        Generate a response to `user_message`, using `user_id` as a thread key
-        so the conversation is remembered across multiple calls.
+        Generate a response to the user's message while maintaining conversation context
+        using the provided user ID as a thread identifier.
+        
+        Args:
+            user_id (str): A unique identifier for the user to maintain conversation state.
+            user_message (str): The user's input message.
+
+        Returns:
+            str: The AI's response to the user's message.
         """
-        # 1) Create a HumanMessage to represent the user's new message
+        # Wrap the user's message in a HumanMessage object
         new_message = [HumanMessage(content=user_message)]
 
-        # 2) Use app.invoke(...) to pass the new message + existing conversation
-        # The "config" argument includes the thread_id -> "user_id"
+        # Invoke the workflow, providing the new message and user-specific thread ID
         output = await self.app.ainvoke(
             {"messages": new_message},
             config={"configurable": {"thread_id": user_id}},
         )
 
-        # 3) The output is the entire updated conversation. The last message is the AI’s reply.
-        # output["messages"] is a list of message objects (including system/human/AI).
-        # So we just return the content of the final (AI) message.
+        # Extract the last message from the conversation as the AI's reply
         ai_message = output["messages"][-1].content
         return ai_message

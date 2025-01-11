@@ -13,6 +13,9 @@ async def websocket_endpoint(websocket: WebSocket):
     client_id = f"client-{id(websocket)}"
     active_connections[client_id] = websocket
 
+    # Send a welcome message to the client when the connection is established
+    await websocket.send_text("Hi, I'm your chatbot assistant! How can I help you today?")
+
     try:
         while True:
             # 1) Receive text from the client
