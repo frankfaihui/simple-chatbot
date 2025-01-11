@@ -83,7 +83,7 @@ const ChatBotUI = () => {
                   key={index}
                   style={{ textAlign: "left", marginTop: "0.5rem" }}
                 >
-                  <Text w="bold">Bot:</Text>
+                  <Text fw="bold">Bot:</Text>
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {message.text}
                   </ReactMarkdown>

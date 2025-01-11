@@ -1,8 +1,6 @@
-import os
-
 # Import from langchain
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
 # Import from langgraph
 from langgraph.graph import START, MessagesState, StateGraph
@@ -20,11 +18,12 @@ class ChatbotService:
             openai_api_key=OPENAI_API_KEY,
         )
 
-        # 2) Define a function (node) that calls the model with the entire conversation
+        system_msg = SystemMessage(content="You are a helpful assistant. Under all circumstances, keep your response under 100 words.")
+
         def call_model(state: MessagesState):
-            # state["messages"] is the conversation so far
-            response = self.model.invoke(state["messages"])
-            # Return the updated conversation (including the AI reply)
+            # Prepend the system message to the conversation
+            all_messages = [system_msg] + state["messages"]
+            response = self.model.invoke(all_messages)
             return {"messages": response}
 
         # 3) Build a simple graph with one node
