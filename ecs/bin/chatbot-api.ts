@@ -2,6 +2,10 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { ChatbotApiStack } from '../lib/chatbot-api-stack';
+import * as dotenv from 'dotenv';
+
+// Load all key-value pairs from .env into process.env
+dotenv.config();
 
 const app = new cdk.App();
 new ChatbotApiStack(app, 'ChatbotApiStack', {

@@ -33,7 +33,7 @@ export class ChatbotApiStack extends cdk.Stack {
       memoryLimitMiB: 512,
       cpu: 256,
       environment: {
-        // Add any environment variables for your FastAPI app here
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? ''
       },
     });
 
