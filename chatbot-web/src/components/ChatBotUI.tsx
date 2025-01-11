@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Container,
   TextInput,
@@ -9,14 +9,16 @@ import {
   Flex,
   Loader,
 } from "@mantine/core";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const ChatBotUI = () => {
-  const [messages, setMessages] = useState<{ user: boolean; text: string }[]>(
-    []
-  );
+  const [messages, setMessages] = useState<{ user: boolean; text: string }[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [socket, setSocket] = useState<WebSocket | null>(null);
+
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Connect to WebSocket
@@ -41,6 +43,12 @@ const ChatBotUI = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   const sendMessage = () => {
     if (socket && input.trim()) {
       setMessages((prev) => [...prev, { user: true, text: input }]);
@@ -60,18 +68,29 @@ const ChatBotUI = () => {
       <Paper shadow="sm" p="md" radius="md" withBorder>
         <ScrollArea style={{ height: "400px", marginBottom: "1rem" }}>
           <div>
-            {messages.map((message, index) => (
-              <Text
-                key={index}
-                mt="sm"
-                sx={{
-                  color: message.user ? "blue" : "black",
-                  textAlign: message.user ? "right" : "left",
-                }}
-              >
-                {message.user ? "You: " : "Bot: "} {message.text}
-              </Text>
-            ))}
+            {messages.map((message, index) =>
+              message.user ? (
+                <Text
+                  key={index}
+                  mt="sm"
+                  sx={{ color: "blue", textAlign: "right" }}
+                >
+                  You: {message.text}
+                </Text>
+              ) : (
+                /* Bot's message in Markdown */
+                <div
+                  key={index}
+                  style={{ textAlign: "left", marginTop: "0.5rem" }}
+                >
+                  <Text w="bold">Bot:</Text>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {message.text}
+                  </ReactMarkdown>
+                </div>
+              )
+            )}
+            <div ref={bottomRef} />
           </div>
         </ScrollArea>
 
