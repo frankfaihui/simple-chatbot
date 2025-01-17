@@ -10,10 +10,20 @@ export class ChatbotApiStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    const natGatewayProvider = ec2.NatProvider.instanceV2({
+      instanceType: new ec2.InstanceType('t3.nano'),
+      defaultAllowedTraffic: ec2.NatTrafficDirection.OUTBOUND_ONLY,
+    });
+    
     // Step 1: Create a VPC
     const vpc = new ec2.Vpc(this, 'ChatbotApiVpc', {
       maxAzs: 2, // Number of Availability Zones
+      natGatewayProvider
     });
+
+    // Allow outbound traffic from NAT instance to the internet
+    natGatewayProvider.connections.allowFrom(ec2.Peer.anyIpv4(), ec2.Port.tcp(80)); // Allow HTTP
+    natGatewayProvider.connections.allowFrom(ec2.Peer.anyIpv4(), ec2.Port.tcp(443)); // Allow HTTPS
 
     // Step 2: Create an ECS Cluster
     const cluster = new ecs.Cluster(this, 'ChatbotApiCluster', {
