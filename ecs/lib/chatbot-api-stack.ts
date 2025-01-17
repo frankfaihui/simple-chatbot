@@ -69,6 +69,11 @@ export class ChatbotApiStack extends cdk.Stack {
           weight: 1, // Backup for On-Demand
         },
       ],
+      circuitBreaker: {
+        rollback: true, // Enable rollback on deployment failure
+      },
+      minHealthyPercent: 100, // Ensure at least one task remains running, since we have only one instance
+      maxHealthyPercent: 200, // Allow up to double the desired count during deployment
     });
 
     // Step 6: Add an Application Load Balancer (ALB)
