@@ -14,7 +14,7 @@ export class ChatbotApiStack extends cdk.Stack {
       instanceType: new ec2.InstanceType('t3.nano'),
       defaultAllowedTraffic: ec2.NatTrafficDirection.OUTBOUND_ONLY,
     });
-    
+
     // Step 1: Create a VPC
     const vpc = new ec2.Vpc(this, 'ChatbotApiVpc', {
       maxAzs: 2, // Number of Availability Zones
@@ -62,7 +62,11 @@ export class ChatbotApiStack extends cdk.Stack {
       capacityProviderStrategies: [
         {
           capacityProvider: 'FARGATE_SPOT',
-          weight: 1,
+          weight: 3, // Higher priority for Spot
+        },
+        {
+          capacityProvider: 'FARGATE',
+          weight: 1, // Backup for On-Demand
         },
       ],
     });
